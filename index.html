@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion</title>
+  <script src="./test.js" type="module" defer></script>
+  <style>
+    button{
+      margin-bottom: 1rem;
+      background-color: cornflowerblue;
+      border-radius: 5px;
+      width: auto;
+      padding: 10px;
+      margin: 5px;
+      color: white;
+      font-size: large;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      border: none;
+    }
+
+    button:hover{
+      cursor: pointer;
+      color: blanchedalmond;
+    }
+  </style> 
+</head>
+<body>
+
+  <h1>Connexion en cours...</h1>
+  <button id="basicAuth">connexion normale</button>
+  <button id="verifyToken">Verifier Token</button>
+  <button id="getCookieToken">Cookie</button>
+  <button id="logout">Déconnexion</button>
+
+  <script>    
+    basicAuth.onclick = () => {
+      fetch('http://localhost:5000/auth/login', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: 'alexis.sanchez@example.com',
+            password: 'password1234'
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          console.log('Réponse:', data);
+          console.log(document.cookie);
+
+        })
+        .catch(err => console.error('Erreur:', err));
+      };
+
+      
+    verifyToken.onclick = () => {
+      fetch('http://localhost:5000/auth/verifyToken', {
+            method: 'GET',
+            headers: {
+              'Authorization' : `Bearer ici`
+            }
+          })
+        .then(res => res.json())
+        .then(data => console.log(data));
+      };
+
+      logout.onclick = () =>{
+        fetch('http://localhost:5000/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization' : `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MTdhMmMyNWU5N2UwM2NmMzAzNmYzMiIsImlhdCI6MTc0NjUzOTYxNywiZXhwIjoxNzQ2NTgyODE3fQ.6Cql56HOX5gDeOWnXK43gqZMsfjYAfTr7ESB2AmDhsU`
+          }
+        })
+        .then(res => res.json())
+        .then(data => console.log(data));
+      }
+      
+
+  </script>
+</body>
+</html>
