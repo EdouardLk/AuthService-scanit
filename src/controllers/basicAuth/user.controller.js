@@ -1,4 +1,3 @@
-
 // routes/auth.js
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -29,15 +28,15 @@ exports.login = async (req, res) => {
         
         await response.json().then((data) => {
           userToFind = data.user
-          //console.log(userToFind)
+          console.log("Données utilisateur reçues du backend:", userToFind.userName);
         });        
-        const token = jwt.sign( // infomration qui seront enregistré dans le token (lisible avec la méthode jwt.verify)
+        const token = jwt.sign( // information qui seront enregistré dans le token (lisible avec la méthode jwt.verify)
           {
            id: userToFind.id, 
            email: userToFind.email,
            firstName : userToFind.firstName,
            lastName : userToFind.lastName,
-           username : userToFind.userName,
+           userName : userToFind.userName,
            credits: userToFind.credits,
            phone: userToFind.phone,
            role: userToFind.role, // admin / moderator / paysans (user) lol
