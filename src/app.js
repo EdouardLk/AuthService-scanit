@@ -1,4 +1,3 @@
-
 // app.js
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -13,7 +12,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 app.use(cors({
-    origin: [ "http://127.0.0.1:5500", `${process.env.DATABASE_SERVICE_URL}`, `${process.env.FRONT_END_URL}` ],
+    origin: [ "http://127.0.0.1:5500", "http://localhost:5500", `${process.env.DATABASE_SERVICE_URL}`, `${process.env.FRONT_END_URL}` ],
     credentials : true
 }));
 
