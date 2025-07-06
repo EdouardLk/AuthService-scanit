@@ -2,8 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
-const passport = require('passport');
+const passport = require('./config/passport');
 
 require('dotenv').config();
 
@@ -20,9 +19,17 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(cors({
-    origin: [ "http://127.0.0.1:5500", "http://localhost:5500", `${process.env.DATABASE_SERVICE_URL}`, `${process.env.FRONT_END_URL}` ],
-    credentials : true
+    origin: [ 
+      "http://127.0.0.1:5500", 
+      "http://localhost:5500", 
+      process.env.DATABASE_SERVICE_URL, 
+      process.env.FRONT_END_URL 
+    ],
+    credentials: true
 }));
+
+// Initialiser Passport
+app.use(passport.initialize());
 
 // Routes
 app.use('/ping', (req, res) => {
@@ -30,8 +37,7 @@ app.use('/ping', (req, res) => {
 });
 
 app.use('/auth', require('./routes/basicAuth/user.routes'));
-app.use('/google', require('./routes/googleAuth/user.routes'));
-app.use('/email', require('./routes/email/email.routes'));
+app.use('/auth/google', require('./routes/googleAuth/google.routes'));
 
 
 // Lancement serveur
