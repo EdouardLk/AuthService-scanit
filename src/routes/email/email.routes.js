@@ -11,7 +11,7 @@ router.post('/confirm', async (req, res) => {
     const token = jwt.sign(
             { id: req.body.id, email: req.body.email }, 
             JWT_SECRET, 
-            { expiresIn: '1h' } // periode de validité du token, le client aura 1h pour confirmer son email
+            { expiresIn: '10m' } // periode de validité du token, le client aura 1h pour confirmer son email
         );
  
     const response = await fetch(`${process.env.NOTIFICATION_SERVICE_URL}/email/confirm` , {
@@ -32,21 +32,15 @@ router.post('/confirm', async (req, res) => {
 });
 
 
-router.get('/verifyToken', (req, res) => { // méthode à la racine simplement pour vérifier la validité d'un token, les autres services appelerons cette méthode dans leur middelware
-    const authHeader = req.headers['authorization'];
+router.get('/verifyToken/:token', (req, res) => { // méthode à la racine simplement pour vérifier la validité d'un token, les autres services appelerons cette méthode dans leur middelware
   
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(400).json({ message: 'Header Authorization manquant ou mal formuler' });
-    }
-  
-    const token = authHeader.split(' ')[1]; // Récupère le token après "Bearer"
-  
+    const token = req.params.token
     try {
-      const decoded = jwt.verify(token, JWT_SECRET);
-      console.log(decoded);
-      res.status(200).json({ user: decoded });
-    } catch (err) {
-      res.status(403).json({ message: 'Token invalide ou expiré' });
+        const decoded = jwt.verify(token, JWT_SECRET);
+        console.log(decoded);
+        res.status(200).json({ user: decoded });
+    } catch (err) {        
+        res.status(403).json({ message: 'La periode de validité de ce mail est expiré' });
     }
 });
 
