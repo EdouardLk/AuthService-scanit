@@ -31,6 +31,7 @@ app.use('/ping', (req, res) => {
 
 app.use('/auth', require('./routes/basicAuth/user.routes'));
 app.use('/google', require('./routes/googleAuth/user.routes'));
+app.use('/email', require('./routes/email/email.routes'));
 
 
 // Lancement serveur
