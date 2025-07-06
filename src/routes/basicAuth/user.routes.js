@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 router.post('/login', userController.login);
 router.post('/logout' ,userController.logout);
 
-router.get('/verifyToken', (req, res) => { // méthode à la racine simplement pour vérifier la validité d'un token, les autres services appelerons cette méthode dans leur middelware inshAllah 
+router.get('/verifyToken', (req, res) => { // méthode à la racine simplement pour vérifier la validité d'un token, les autres services appelerons cette méthode dans leur middelware
     const authHeader = req.headers['authorization'];
   
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

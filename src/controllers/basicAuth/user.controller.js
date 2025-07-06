@@ -1,3 +1,5 @@
+//BasicAuth
+
 // routes/auth.js
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -28,9 +30,9 @@ exports.login = async (req, res) => {
         
         await response.json().then((data) => {
           userToFind = data.user
-          console.log("Données utilisateur reçues du backend:", userToFind.userName);
+          console.log("Données utilisateur reçues du backend:", userToFind);
         });        
-        const token = jwt.sign( // information qui seront enregistré dans le token (lisible avec la méthode jwt.verify)
+        const token = jwt.sign( // informations qui seront enregistré dans le token (lisible avec la méthode jwt.verify)
           {
            id: userToFind.id, 
            email: userToFind.email,
@@ -40,7 +42,8 @@ exports.login = async (req, res) => {
            credits: userToFind.credits,
            phone: userToFind.phone,
            role: userToFind.role, // admin / moderator / paysans (user) lol
-           tier: userToFind.tier, 
+           tier: userToFind.tier,
+           isVerified : userToFind.isVerified
           }, 
           JWT_SECRET, 
           { expiresIn: '12h' }

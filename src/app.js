@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const passport = require('./config/passport');
+
 require('dotenv').config();
 
 const cors = require('cors');
@@ -11,6 +12,11 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.json());
+
+// pour google
+app.use(session({ secret: 'session_secret', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(cors({
     origin: [ 
@@ -32,6 +38,7 @@ app.use('/ping', (req, res) => {
 
 app.use('/auth', require('./routes/basicAuth/user.routes'));
 app.use('/auth/google', require('./routes/googleAuth/google.routes'));
+
 
 // Lancement serveur
 const PORT = process.env.PORT;
