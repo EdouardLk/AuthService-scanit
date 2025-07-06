@@ -30,7 +30,7 @@ exports.login = async (req, res) => {
         
         await response.json().then((data) => {
           userToFind = data.user
-          console.log("Données utilisateur reçues du backend:", userToFind.userName);
+          console.log("Données utilisateur reçues du backend:", userToFind);
         });        
         const token = jwt.sign( // informations qui seront enregistré dans le token (lisible avec la méthode jwt.verify)
           {
@@ -43,6 +43,7 @@ exports.login = async (req, res) => {
            phone: userToFind.phone,
            role: userToFind.role, // admin / moderator / paysans (user) lol
            tier: userToFind.tier,
+           isVerified : userToFind.isVerified
           }, 
           JWT_SECRET, 
           { expiresIn: '12h' }
