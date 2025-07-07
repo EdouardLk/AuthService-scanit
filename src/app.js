@@ -2,6 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const passport = require('./config/passport');
 
 require('dotenv').config();
@@ -38,7 +39,7 @@ app.use('/ping', (req, res) => {
 
 app.use('/auth', require('./routes/basicAuth/user.routes'));
 app.use('/auth/google', require('./routes/googleAuth/google.routes'));
-
+app.use('/email', require('./routes/email/email.routes'));
 
 // Lancement serveur
 const PORT = process.env.PORT;
