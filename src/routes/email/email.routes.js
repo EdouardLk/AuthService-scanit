@@ -4,31 +4,41 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET; 
 
 router.post('/confirm', async (req, res) => {
-    //envoyer une requête au service de mail pour le mail de confirmation de compte
-    console.log("in auth confirm mail")
+    try {
+        console.log("=== Début de la confirmation d'email ===");
+        console.log("Données reçues:", req.body);
 
-    // génération d'un token avec id du user pour l'envoyer vers le service de mail (sera nécessaire pour le mail de confirmation)
-    const token = jwt.sign(
+        // génération d'un token avec id du user pour l'envoyer vers le service de mail
+        const token = jwt.sign(
             { id: req.body.id, email: req.body.email }, 
             JWT_SECRET, 
-            { expiresIn: '10m' } // periode de validité du token, le client aura 1h pour confirmer son email
+            { expiresIn: '10m' }
         );
- 
-    const response = await fetch(`${process.env.NOTIFICATION_SERVICE_URL}/email/confirm` , {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({token : token , email : req.body.email})
-    });
+        console.log("Token généré pour l'email");
 
+        const notificationUrl = `${process.env.NOTIFICATION_SERVICE_URL}/email/confirm`;
+        console.log("Tentative d'envoi vers:", notificationUrl);
         
-    if (!response.ok) {
-        //console.log("ici");
-        throw new Error(`Response status: ${response.status}`);                        
-    }else{
-        console.log("Email correctement envoyé");
-        res.status(200).json({message : "reqûete vers le service de mail bien envoyé"})
-    }
+        const response = await fetch(notificationUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({token: token, email: req.body.email})
+        });
 
+        console.log("Réponse du service de notification:", response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Erreur du service de notification:", errorText);
+            throw new Error(`Response status: ${response.status}`);
+        } else {
+            console.log("Email correctement envoyé");
+            res.status(200).json({message: "requête vers le service de mail bien envoyée"});
+        }
+    } catch (error) {
+        console.error("Erreur lors de l'envoi d'email:", error);
+        res.status(500).json({error: error.message});
+    }
 });
 
 
