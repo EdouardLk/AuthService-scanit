@@ -41,8 +41,5 @@ app.use('/auth', require('./routes/basicAuth/user.routes'));
 app.use('/auth/google', require('./routes/googleAuth/google.routes'));
 app.use('/email', require('./routes/email/email.routes'));
 
-// Lancement serveur
-const PORT = process.env.PORT;
-app.listen(PORT, () => {
-  console.log(`Serveur en écoute sur http://localhost:${PORT}`);
-});
+
+module.exports = app;
