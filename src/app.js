@@ -14,6 +14,13 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.json());
 
+
+console.log("🚀 Auth service starting...");
+console.log("Env PORT:", process.env.PORT);
+console.log("Env JWT_SECRET:", process.env.JWT_SECRET ? "set" : "missing");
+console.log("Env DB_URL:", process.env.DATABASE_SERVICE_URL ? "set" : "missing");
+
+
 // pour google
 app.use(session({ secret: 'session_secret', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
