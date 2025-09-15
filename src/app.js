@@ -8,62 +8,14 @@ const passport = require('./config/passport');
 require('dotenv').config();
 
 const cors = require('cors');
+const client = require('prom-client');
 
 const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.json());
 
-
-console.log("🚀 Auth service starting...");
-console.log("Env PORT:", process.env.PORT);
-console.log("Env JWT_SECRET:", process.env.JWT_SECRET ? "set" : "missing");
-console.log("Env DB_URL:", process.env.DATABASE_SERVICE_URL ? "set" : "missing");
-
-
-// pour google
-app.use(session({ secret: 'session_secret', resave: false, saveUninitialized: true }));
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(cors({
-    origin: [ 
-      "http://127.0.0.1:5500", 
-      "http://localhost:5500", 
-      process.env.DATABASE_SERVICE_URL, 
-      process.env.FRONT_END_URL 
-    ],
-    credentials: true
-}));
-
-// Initialiser Passport
-app.use(passport.initialize());
-
-app.use((req, res, next) => {
-    console.log(`📩 Requête reçue : ${req.method} ${req.url}`);
-
-    // Middleware pour mesurer chaque requête
-    const end = httpRequestDurationSeconds.startTimer();
-    res.on('finish', () => {
-      httpRequestsTotal.inc({ method: req.method, route: req.path, status: res.statusCode });
-      end({ method: req.method, route: req.path, status: res.statusCode });
-    });
-
-    next();
-});
-
-// Routes
-app.use('/ping', (req, res) => {
-  res.json({ message: `pingeuuu!` });
-});
-
-app.use('/auth', require('./routes/basicAuth/user.routes'));
-app.use('/auth/google', require('./routes/googleAuth/google.routes'));
-app.use('/email', require('./routes/email/email.routes'));
-
-
-//----------------partie metrics------------//
-const client = require('prom-client');
+// ------------------- Partie metrics -------------------
 
 // Crée un registre pour stocker toutes les métriques
 const register = new client.Registry();
@@ -90,17 +42,50 @@ const httpRequestDurationSeconds = new client.Histogram({
 register.registerMetric(httpRequestsTotal);
 register.registerMetric(httpRequestDurationSeconds);
 
+// Middleware pour mesurer chaque requête
+app.use((req, res, next) => {
+    console.log(`📩 Requête reçue : ${req.method} ${req.url}`);
+
+    const end = httpRequestDurationSeconds.startTimer();
+    res.on('finish', () => {
+      httpRequestsTotal.inc({ method: req.method, route: req.path, status: res.statusCode });
+      end({ method: req.method, route: req.path, status: res.statusCode });
+    });
+
+    next();
+});
 
 // Endpoint pour exposer les métriques
 app.get('/metrics', async (req, res) => {
-
-    //middleware
     if (req.query.token !== process.env.METRICS_TOKEN) return res.status(403).send("Forbidden");
 
-    
     res.set('Content-Type', register.contentType);
     res.end(await register.metrics());
 });
 
+// ------------------- pour google (sessions & passport) -------------------
+app.use(session({ secret: 'session_secret', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+// ------------------- CORS -------------------
+app.use(cors({
+    origin: [ 
+      "http://127.0.0.1:5500", 
+      "http://localhost:5500", 
+      process.env.DATABASE_SERVICE_URL, 
+      process.env.FRONT_END_URL 
+    ],
+    credentials: true
+}));
+
+// ------------------- Routes -------------------
+app.use('/ping', (req, res) => {
+  res.json({ message: `pingeuuu!` });
+});
+
+app.use('/auth', require('./routes/basicAuth/user.routes'));
+app.use('/auth/google', require('./routes/googleAuth/google.routes'));
+app.use('/email', require('./routes/email/email.routes'));
 
 module.exports = app;
